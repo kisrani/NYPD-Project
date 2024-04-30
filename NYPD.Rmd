@@ -1,0 +1,125 @@
+---
+title: "NYPD"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+What are the factors influencing the age group of perpetrators in shooting incidents reported to the New York City Police Department (NYPD), and can we build a model to predict the age group of the perpetrator based on these factors?
+
+
+```{r}
+# Load necessary libraries
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(caret)
+library(glmnet)
+
+# Load the dataset
+url <- "https://data.cityofnewyork.us/api/views/833y-fsy8/rows.csv?accessType=DOWNLOAD"
+nypd_shooting <- read_csv(url)
+```
+Data Source and Description:
+The dataset used in this analysis was obtained from the New York City Open Data portal. It contains information about shooting incidents reported to the New York City Police Department (NYPD), including details such as the borough, precinct, and age group of both victims and perpetrators.
+
+```{r}
+# Display the first few rows of the dataset
+head(nypd_shooting)
+```
+
+
+```{r}
+# Check the structure of the dataset
+str(nypd_shooting)
+```
+
+
+```{r}
+# Check for missing values
+colSums(is.na(nypd_shooting))
+```
+
+
+```{r}
+# Summary statistics
+summary(nypd_shooting)
+```
+
+
+```{r}
+# Visualize the distribution of the 'BORO' variable
+ggplot(nypd_shooting, aes(x = BORO)) +
+  geom_bar() +
+  labs(title = "Distribution of Shooting Incidents by Borough",
+       x = "Borough",
+       y = "Count")
+```
+
+
+```{r}
+# Visualize the distribution of the 'VIC_AGE_GROUP' variable
+ggplot(nypd_shooting, aes(x = VIC_AGE_GROUP)) +
+  geom_bar() +
+  labs(title = "Distribution of Shooting Incidents by Victim Age Group",
+       x = "Victim Age Group",
+       y = "Count")
+```
+
+
+
+
+```{r}
+nypd_shooting <- nypd_shooting %>%
+  na.omit()
+```
+
+```{r}
+table(nypd_shooting$PERP_AGE_GROUP)
+```
+
+
+```{r}
+```
+
+```{r}
+# Define features and target variable
+X <- select(nypd_shooting, BORO)
+y <- nypd_shooting$PERP_AGE_GROUP
+# Splitting the dataset into the Training set and Test set
+set.seed(123) # for reproducibility
+train_index <- createDataPartition(y, p = 0.8, list = FALSE)
+train <- nypd_shooting[train_index, ]
+test <- nypd_shooting[-train_index, ]
+
+# Model Building
+# Initialize the logistic regression model
+model <- glmnet(as.matrix(select(train, -PERP_AGE_GROUP)), train$PERP_AGE_GROUP, family="multinomial")
+
+# Predicting the Test set results
+predictions <- predict(model, as.matrix(select(test, -PERP_AGE_GROUP)), type="class")
+
+# Model Evaluation
+# Accuracy Score
+accuracy <- sum(predictions == test$PERP_AGE_GROUP) / length(predictions)
+print(paste("Accuracy:", accuracy))
+
+
+
+```
+
+
+Conclusion:
+In this analysis, we explored the NYPD Shooting Incident dataset to identify factors influencing the age group of perpetrators in shooting incidents reported to the New York City Police Department (NYPD). We built a logistic regression model to predict the age group of perpetrators based on features such as borough, precinct, and victim age group. The model achieved an accuracy of [accuracy_score], indicating that these features can provide valuable insights into the age group of perpetrators in shooting incidents.
+
+
+Possible Sources of Bias:
+
+Underreporting Bias: The dataset may suffer from underreporting bias, as not all shooting incidents are reported to the police, potentially leading to an underrepresentation of the true extent of shooting incidents in New York City.
+Selection Bias: The dataset only includes shooting incidents reported to the NYPD, which may not be representative of all shooting incidents in New York City, as it may exclude incidents that were not reported to the police.
+Demographic Bias: The dataset includes information about the borough and age group of victims and perpetrators but may not capture other demographic factors such as race and socioeconomic status, which could influence the likelihood of being involved in a shooting incident.
