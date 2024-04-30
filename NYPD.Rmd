@@ -115,7 +115,7 @@ print(paste("Accuracy:", accuracy))
 
 
 Conclusion:
-In this analysis, we explored the NYPD Shooting Incident dataset to identify factors influencing the age group of perpetrators in shooting incidents reported to the New York City Police Department (NYPD). We built a logistic regression model to predict the age group of perpetrators based on features such as borough, precinct, and victim age group. The model achieved an accuracy of [accuracy_score], indicating that these features can provide valuable insights into the age group of perpetrators in shooting incidents.
+In this analysis, we explored the NYPD Shooting Incident dataset to identify factors influencing the age group of perpetrators in shooting incidents reported to the New York City Police Department (NYPD). We built a logistic regression model to predict the age group of perpetrators based on features such as borough, precinct, and victim age group. The model achieved an accuracy of 0.396, indicating that these features can provide valuable insights into the age group of perpetrators in shooting incidents.
 
 
 Possible Sources of Bias:
